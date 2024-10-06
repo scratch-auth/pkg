@@ -1,6 +1,6 @@
 {
   "name": "@scratch-auth/nextjs",
-  "version": "0.0.1-beta.6",
+  "version": "0.0.1-beta.7",
   "description": "Scratch Auth is a simple OAuth service for Scratch. It provides developers with an easy-to-understand API and users with a smooth login experience. By using @scratch-auth/nextjs, you can easily implement OAuth functionality into your site.",
   "main": "./src/index.d.ts",
   "scripts": {
@@ -19,7 +19,7 @@
     "url": "https://github.com/scratch-auth/pkg/issues",
     "email": "fun117.kun@gmail.com"
   },
-  "homepage": "https://scratch-auth.vercel.app",
+  "homepage": "https://scratch-auth.netlify.app",
   "license": "MIT",
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.1",

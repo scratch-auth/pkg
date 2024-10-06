@@ -3,7 +3,7 @@ export const _config = {
   docsRepositoryBase: "https://github.com/scratch-auth/pkg/tree/main",
 
   title: "Scratch Auth",
-  origin: "https://scratch-auth.vercel.app",
+  origin: "https://scratch-auth.netlify.app",
 
   author: {
     name: "Scratch Auth",
