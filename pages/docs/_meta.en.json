@@ -1,0 +1,20 @@
+{
+  "introduction": "Introduction",
+  "nextjs": "",
+  "react": "",
+  "-- More": {
+    "type": "separator",
+    "title": "More"
+  },
+  "license": "License",
+  "scratchauth-link": {
+    "title": "Scratch Auth ↗",
+    "href": "https://auth.itinerary.eu.org/",
+    "newWindow": true
+  },
+  "nextra-link": {
+    "title": "Nextra ↗",
+    "href": "https://nextra.site",
+    "newWindow": true
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "index": {
+    "title": "ホーム",
+    "type": "page",
+    "display": "hidden"
+  },
+  "docs": {
+    "title": "ドキュメント",
+    "type": "page"
+  },
+  "about": {
+    "title": "概要",
+    "type": "page",
+    "theme": {
+      "typesetting": "article"
+    }
+  }
+}

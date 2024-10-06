@@ -1,0 +1,166 @@
+---
+title: クイックスタート
+image: /favicon/apple-touch-icon.png
+---
+
+import { Callout, Steps, FileTree, Tabs } from "nextra/components";
+import { Check, X, Info } from "lucide-react";
+
+<Steps>
+### インストール
+Scratch Auth は NPM パッケージのセットで構成されています。
+<Tabs items={["npm", "yarn", "pnpm"]}>
+  <Tabs.Tab>
+```bash
+npm install @scratch-auth/nextjs
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```bash
+yarn install @scratch-auth/nextjs
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```bash
+pnpm install @scratch-auth/nextjs
+```
+  </Tabs.Tab>
+</Tabs>
+
+### 環境変数を設定する
+
+次のキーをファイルに追加します。これらのキーは、 `openssl rand -hex 32` からいつでも取得できます。
+
+```bash filename="bash"
+openssl rand -hex 32
+```
+
+```env filename=".env.local"
+SCRATCH_AUTH_SECRET_KEY=***************************************
+```
+
+### セッション検証ページを追加する
+
+このページではセッションを解読し、アカウント情報を検証します。`scratch-auth.config.ts` で設定した `redirect_url` のパスに、このファイルを追加する必要があります。リダイレクト時には、パラメーター `privateCode` にセッションが設定されています。
+
+```tsx filename="app/api/auth/page.tsx"
+"use client";
+
+import React, { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { setScratchAuthSession } from "@scratch-auth/nextjs";
+
+export default function AuthPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const privateCode = searchParams.get("privateCode");
+
+  useEffect(() => {
+    async function auth() {
+      console.log(privateCode);
+      const check = await setScratchAuthSession(privateCode);
+      console.log("check", check);
+      if (check) {
+        console.log("認証に成功しました");
+      } else {
+        console.error("認証に失敗しました");
+      }
+      router.push("/");
+    }
+    auth();
+  }, [privateCode]);
+
+  return (
+    <div className="flex justify-center items-center w-full h-full min-h-[calc(100dvh-64px)]">
+      Scratchアカウントを認証中...
+    </div>
+  );
+}
+```
+
+### 認証ボタンを設置する
+
+Scratch Auth の事前構築済みコンポーネントを 使用すると、ログインしたユーザーとログアウトしたユーザーが表示できるコンテンツを制御できます。まず、ユーザーがログインまたはログアウトするためのヘッダーを作成します。これを行うには、以下を使用します。
+- `<LogIned>`: このコンポーネントの子は、ログインしているときのみ表示されます。
+- `<LogOuted>`: このコンポーネントの子は、ログアウトしているときにのみ表示されます。
+- `<UserButton />`: ユーザーがログインしているアカウントのアバターを表示するためにすぐに使用できるスタイルが設定された、事前構築されたコンポーネントです。
+- `<LogInButton />`: ログインページにリンクするスタイル設定されていないコンポーネント。この例では、ログイン URL にプロパティや環境変数 を指定していないため、コンポーネントはアカウント ポータルの ログインページにリンクします。
+
+```tsx filename="app/page.tsx"
+import React from "react";
+import {
+  LogInButton,
+  LogIned,
+  LogOuted,
+  UserButton,
+} from "@scratch-auth/nextjs";
+
+export default function Page() {
+  return (
+    <div>
+      <LogOuted>
+        <LogInButton />
+      </LogOuted>
+      <LogIned>
+        <UserButton />
+      </LogIned>
+    </div>
+  );
+}
+```
+
+### パッケージの設定ファイルを追加する
+
+| 項目         | 内容                       |
+| ------------ | -------------------------- |
+| COOKIE_NAME  | クッキーに保存する名前     |
+| redirect_url | セッション認証ページの URL |
+| title        | プロジェクトタイトル       |
+| expiration   | セッションの有効期限       |
+| cn           | CN 関数                    |
+| debug        | デバッグモード             |
+
+
+```tsx filename="scratch-auth.config.ts"
+import { ScratchAuthConfig } from "@scratch-auth/nextjs/src/types";
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+const config: ScratchAuthConfig = {
+  COOKIE_NAME: "scratch-auth-session",
+  redirect_url: `http://localhost:3000/api/auth`,
+  title: `Scratch Auth`,
+  expiration: 30,
+  cn: function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+  },
+  debug: true,
+};
+
+export default config;
+```
+
+### Scratch アカウントを認証をする
+
+次のコマンドでプロジェクトを実行します。
+
+<Tabs items={["npm", "yarn", "pnpm"]}>
+  <Tabs.Tab>
+```bash
+npm run dev
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```bash
+yarn dev
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```bash
+pnpm dev
+```
+</Tabs.Tab>
+</Tabs>
+[http://localhost:3000 ↗](http://localhost:3000) にあるアプリのホームページにアクセスします。サインアップして最初のユーザーを作成します。
+
+</Steps>
