@@ -7,7 +7,7 @@ if (!config) {
 }
 
 export default {
-  COOKIE_NAME: "_scratch-auth-session", // Cookieの名前を指定
+  COOKIE_NAME: config.COOKIE_NAME ||  "_scratch-auth-session",
   redirect_url: config.redirect_url || "https://localhost:3000/api/auth",
   title: config.title || "Scratch Auth",
   expiration: config.expiration || 30,
