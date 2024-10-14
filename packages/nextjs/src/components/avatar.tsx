@@ -1,5 +1,6 @@
 "use client";
 
+import "./avatar.css";
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import pkgConfig from "../pkgConfig";
