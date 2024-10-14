@@ -1,4 +1,4 @@
-# Scratch Auth
+# [Scratch Auth](https://scratch-auth.netlify.app)
 
 ## Overview
 

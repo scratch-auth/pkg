@@ -64,20 +64,26 @@ export async function setScratchAuthSession(
   privateCode: Session
 ): Promise<boolean> {
   if (!privateCode) {
-    console.warn("setScratchAuthSession: privateCode is null");
+    if (pkgConfig.debug) {
+      console.warn("setScratchAuthSession: privateCode is null");
+    }
     return false;
   }
 
   try {
     const res = await ScratchAuthVerifyToken(privateCode);
     if (!res) {
-      console.error("Invalid token response during session setup.");
+      if (pkgConfig.debug) {
+        console.error("Invalid token response during session setup.");
+      }
       return false;
     }
 
     const obj = JSON.parse(res);
     if (!obj.data?.username) {
-      console.error("Username missing from token response.");
+      if (pkgConfig.debug) {
+        console.error("Username missing from token response.");
+      }
       return false;
     }
 
@@ -104,7 +110,6 @@ export async function ScratchAuthLogin(): Promise<boolean> {
   redirect(
     `https://auth.itinerary.eu.org/auth/?redirect=${redirectLocation}&name=${pkgConfig.title}`
   );
-  return true;
 }
 
 // ログアウト処理

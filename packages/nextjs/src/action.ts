@@ -2,8 +2,9 @@
 
 import crypto from "crypto";
 import { v4 as uuidv4 } from "uuid";
-import { deleteCookie, getCookie, setCookie } from "./cookie/cookie.server";
 import pkgConfig from "./pkgConfig";
+import { cookies } from "next/headers";
+import { deleteCookie } from "./cookie/cookie.server";
 
 const secretKey = process.env.SCRATCH_AUTH_SECRET_KEY!;
 if (!secretKey) {
@@ -20,30 +21,46 @@ export async function ScratchAuthCalculateHmac(text: string): Promise<string> {
   return crypto.createHmac("sha256", secretKey).update(text).digest("hex");
 }
 
-// AES暗号化を使って文字列を暗号化
+// AES-GCMを使って文字列を暗号化
 export async function ScratchAuthEncrypt(text: string): Promise<string> {
-  const iv = crypto.randomBytes(16); // 初期化ベクトル
+  const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv(
-    "aes-256-cbc",
+    "aes-256-gcm",
     Buffer.from(secretKey, "hex"),
     iv
   );
+
   let encrypted = cipher.update(text, "utf8", "hex");
   encrypted += cipher.final("hex");
-  return iv.toString("hex") + ":" + encrypted; // IVと暗号文を結合
+
+  const authTag = cipher.getAuthTag().toString("hex");
+
+  return `${iv.toString("hex")}:${encrypted}:${authTag}`;
 }
 
-// AES復号化を使って文字列を復号化
-export async function ScratchAuthDecrypt(text: string): Promise<string> {
-  const [iv, encrypted] = text.split(":");
-  const decipher = crypto.createDecipheriv(
-    "aes-256-cbc",
-    Buffer.from(secretKey, "hex"),
-    Buffer.from(iv, "hex")
-  );
-  let decrypted = decipher.update(encrypted, "hex", "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
+// AES-GCMを使って文字列を復号化
+export async function ScratchAuthDecrypt(text: string): Promise<string | null> {
+  try {
+    const [iv, encrypted, authTag] = text.split(":");
+    const decipher = crypto.createDecipheriv(
+      "aes-256-gcm",
+      Buffer.from(secretKey, "hex"),
+      Buffer.from(iv, "hex")
+    );
+
+    decipher.setAuthTag(Buffer.from(authTag, "hex"));
+
+    let decrypted = decipher.update(encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+
+    return decrypted;
+  } catch (error) {
+    if (pkgConfig.debug) {
+      console.warn("Decryption failed:", error);
+    }
+    await deleteCookie(pkgConfig.COOKIE_NAME);
+    return null;
+  }
 }
 
 // トークンの検証
@@ -76,16 +93,16 @@ export async function setScratchAuthEncryptedData(
   value: string,
   days: number
 ): Promise<void> {
-  const hmac = await ScratchAuthCalculateHmac(value); // HMACを計算
-  const encryptedValue = await ScratchAuthEncrypt(value + "|" + hmac); // データとHMACを結合し、暗号化
+  const hmac = await ScratchAuthCalculateHmac(value);
+  const encryptedValue = await ScratchAuthEncrypt(value + "|" + hmac);
   const expires = new Date();
   if (days === -1) {
-    expires.setFullYear(expires.getFullYear() + 200); // 有効期限を200年後に設定
+    expires.setFullYear(expires.getFullYear() + 200);
   } else {
-    expires.setDate(expires.getDate() + days); // 指定日数後に期限切れに
+    expires.setDate(expires.getDate() + days);
   }
 
-  await setCookie({
+  cookies().set({
     name: content,
     value: encryptedValue,
     expires: expires,
@@ -97,40 +114,45 @@ export async function setScratchAuthEncryptedData(
 export async function getScratchAuthDecryptedSessionId(
   content: string
 ): Promise<string | null> {
-  const encryptedValue = await getCookie(content); // Cookieから値を取得
+  const encryptedValue = cookies().get(content);
   if (encryptedValue) {
-    try {
-      const decryptedValue = await ScratchAuthDecrypt(encryptedValue.value); // 復号化を試みる
-      const [sessionId, hmac] = decryptedValue.split("|"); // セッションIDとHMACに分割
-      const calculatedHmac = await ScratchAuthCalculateHmac(sessionId); // HMACを再計算
+    const decryptedValue = await ScratchAuthDecrypt(encryptedValue.value);
+    if (decryptedValue) {
+      const [sessionId, hmac] = decryptedValue.split("|");
+      const calculatedHmac = await ScratchAuthCalculateHmac(sessionId);
       if (calculatedHmac === hmac) {
-        return sessionId; // 検証が成功した場合はセッションIDを返す
+        return sessionId;
       } else {
-        console.warn("HMAC does not match. Deleting cookie.");
-        await deleteCookie(content); // HMACが一致しない場合、Cookieを削除
+        if (pkgConfig.debug) {
+          console.warn("HMAC does not match. Deleting cookie.");
+        }
+        await deleteCookie(content);
       }
-    } catch (error) {
-      console.error("Error during decryption:", error);
-      await deleteCookie(content); // 復号化に失敗した場合、Cookieを削除
+    } else {
+      if (pkgConfig.debug) {
+        console.warn("Decryption failed. Deleting cookie.");
+      }
     }
   }
   return null;
 }
 
-// ユーザー名とIVを取得する新しい関数を作成
+// ユーザー名とIVを取得する関数
 export async function getScratchAuthUserName(
   content: string
 ): Promise<string | null> {
-  const encryptedValue = await getCookie(content); // Cookieから値を取得
+  const encryptedValue = cookies().get(content);
   if (encryptedValue) {
-    try {
-      const decrypted = await ScratchAuthDecrypt(encryptedValue.value); // 復号化
-      const [username] = decrypted.split("|"); // ユーザー名を取得
-      return username; // ユーザー名を返す
-    } catch (error) {
-      console.error("Error during decryption:", error);
-      await deleteCookie(content); // 復号化に失敗した場合、Cookieを削除
+    const decrypted = await ScratchAuthDecrypt(encryptedValue.value);
+    if (decrypted) {
+      const [username] = decrypted.split("|");
+      return username;
+    } else {
+      if (pkgConfig.debug) {
+        console.warn("Decryption failed. Deleting cookie.");
+      }
     }
   }
+  await deleteCookie(content);
   return null;
 }

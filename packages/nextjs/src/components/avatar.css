@@ -1,0 +1,47 @@
+.rounded-full {
+  border-radius: 9999px;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+.shrink-0 {
+  flex-shrink: 0;
+}
+.w-10 {
+  width: 2.5rem;
+}
+.h-10 {
+  height: 2.5rem;
+}
+.flex {
+  display: flex;
+}
+.relative {
+  position: relative;
+}
+
+.w-full {
+  width: 100%;
+}
+.h-full {
+  height: 100%;
+}
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: block;
+  vertical-align: middle;
+}
