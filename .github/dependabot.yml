@@ -9,11 +9,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    versioning-strategy: "increase-minor"
 
   # /packages ディレクトリ内の npm パッケージの依存関係をチェック
   - package-ecosystem: "npm"
     directory: "/packages/nextjs"
     schedule:
       interval: "daily"
-    versioning-strategy: "increase-minor"
