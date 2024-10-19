@@ -4,18 +4,16 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    allow:
-      - dependency-type: "development"
-      - update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-patch"
+    ignore:
+      - dependency-type: "all"
+        update-types:
+          - "version-update:semver-major"
 
   # /packages ディレクトリ内の npm パッケージの依存関係をチェック
   - package-ecosystem: "npm"
     directory: "/packages/nextjs"
     schedule:
       interval: "daily"
-    allow:
+    ignore:
       - update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-patch"
+          - "version-update:semver-major"
