@@ -45,13 +45,14 @@ jobs:
         working-directory: test/nextjs
         run: npm install
 
+      - name: Start the Next.js application
+        working-directory: test/nextjs
+        run: npm run dev &
+
       - name: Run build for nextjs package
-        working-directory: packages/nextjs
+        working-directory: test/nextjs
         run: npm run build
 
-      - name: Start the Next.js application
-        working-directory: packages/nextjs
-        run: npm run dev &
 
       - name: Wait for server to be ready
         run: npx wait-on http://localhost:3000
