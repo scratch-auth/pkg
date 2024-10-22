@@ -136,3 +136,5 @@ Access the app’s homepage at [http://localhost:3000 ↗](http://localhost:3000
 up and create the first user.
 
 </Steps>
+
+[@Looky1173](https://github.com/Looky1173) / [@Fun117](https://github.com/Fun117)
