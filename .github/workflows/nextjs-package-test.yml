@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SCRATCH_AUTH_SECRET_KEY: ${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
       NEXT_PUBLIC_REDIRECT_URL: "http://localhost:3000/api/auth"
 
     services:
@@ -22,8 +21,6 @@ jobs:
         image: scratch-auth/scratch-auth:latest
         ports:
           - 4000:4000
-        options: >-
-          --env SCRATCH_AUTH_SECRET_KEY=${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
 
     steps:
       - name: Checkout repository
@@ -50,6 +47,8 @@ jobs:
         run: npx wait-on http://localhost:3000
 
       - name: Run authentication test
+        env:
+          SCRATCH_AUTH_SECRET_KEY: ${{ secrets.SCRATCH_AUTH_SECRET_KEY }}  # Move secrets here
         run: |
           curl -X POST http://localhost:3000/api/auth -d "privateCode=test"
           echo "Testing authentication successful"
