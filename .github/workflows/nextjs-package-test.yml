@@ -31,19 +31,22 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install dependencies for nextjs package
-        working-directory: packages/nextjs
+      - name: Install dependencies for test package
+        working-directory: test/nextjs
         run: npm install
 
-      - name: Link nextjs package
-        run: |
-          npm link
-          cd test/nextjs
-          npm link nextjs
+      - name: NPM Link for test package
+        working-directory: packages/nextjs
+        run: npm link
 
       - name: Install dependencies for test package
         working-directory: test/nextjs
         run: npm install
+
+      - name: Link @scratch-auth/nextjs package
+        working-directory: test/nextjs
+        run: |
+          npm link @scratch-auth/nextjs
 
       - name: Start the Next.js application
         working-directory: test/nextjs
