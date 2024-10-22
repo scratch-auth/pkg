@@ -1,0 +1,70 @@
+name: Test Scratch Auth Next.js Package
+
+on:
+  push:
+    paths:
+      - "packages/nextjs/**"
+  pull_request:
+    paths:
+      - "packages/nextjs/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      scratch-auth:
+        image: scratch-auth/scratch-auth:latest
+        ports:
+          - 4000:4000
+        options: >-
+          --env SCRATCH_AUTH_SECRET_KEY=${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
+        # 環境変数をsecretsに設定しておき、GitHub Actionsから参照します。
+
+    env:
+      SCRATCH_AUTH_SECRET_KEY: ${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
+      NEXT_PUBLIC_REDIRECT_URL: "http://localhost:3000/api/auth"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        working-directory: packages/nextjs
+        run: npm install
+
+      - name: Run build
+        working-directory: packages/nextjs
+        run: npm run build
+
+      - name: Set environment variables for Scratch Auth
+        run: echo "SCRATCH_AUTH_SECRET_KEY=$SCRATCH_AUTH_SECRET_KEY" >> $GITHUB_ENV
+
+      - name: Start the Next.js application
+        working-directory: packages/nextjs
+        run: npm run dev &
+
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:3000
+
+      - name: Run authentication test
+        run: |
+          curl -X POST http://localhost:3000/api/auth -d "privateCode=test"
+          echo "Testing authentication successful"
+
+      - name: Stop services
+        run: |
+          kill $(lsof -t -i:3000)
+        if: always()
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: nextjs-scratch-auth-test-results
+          path: packages/nextjs/test-results

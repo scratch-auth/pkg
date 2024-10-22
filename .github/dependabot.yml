@@ -9,9 +9,25 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      angular:
+        applies-to: version-updates
+        patterns:
+          - "tar"
+        update-types:
+          - "minor"
+          - "patch"
 
   # /packages ディレクトリ内の npm パッケージの依存関係をチェック
   - package-ecosystem: "npm"
     directory: "/packages/nextjs"
     schedule:
       interval: "daily"
+    groups:
+      angular:
+        applies-to: version-updates
+        patterns:
+          - "tar"
+        update-types:
+          - "minor"
+          - "patch"
