@@ -46,10 +46,12 @@ jobs:
 
       - name: Start the Next.js application
         working-directory: test/nextjs
-        run: npm run dev &  # 開発サーバーをバックグラウンドで起動
+        run: npm run dev & # 開発サーバーをバックグラウンドで起動
 
       - name: Wait for server to be ready
-        run: npx wait-on http://localhost:3000
+        run: |
+          sleep 10  # 10秒待機してから接続を試みる
+          npx wait-on http://localhost:3000
 
       - name: Run authentication test
         run: |
