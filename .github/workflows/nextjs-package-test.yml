@@ -38,7 +38,7 @@ jobs:
       - name: Link nextjs package
         run: |
           npm link
-          cd ../test/nextjs
+          cd /test/nextjs
           npm link nextjs
 
       - name: Install dependencies for test package
