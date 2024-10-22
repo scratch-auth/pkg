@@ -13,17 +13,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      SCRATCH_AUTH_SECRET_KEY: ${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
+      NEXT_PUBLIC_REDIRECT_URL: "http://localhost:3000/api/auth"
+
     services:
       scratch-auth:
         image: scratch-auth/scratch-auth:latest
         ports:
           - 4000:4000
         options: >-
-          --env SCRATCH_AUTH_SECRET_KEY=${{ env.SCRATCH_AUTH_SECRET_KEY }}
-
-    env:
-      SCRATCH_AUTH_SECRET_KEY: ${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
-      NEXT_PUBLIC_REDIRECT_URL: "http://localhost:3000/api/auth"
+          --env SCRATCH_AUTH_SECRET_KEY=${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
 
     steps:
       - name: Checkout repository
@@ -41,9 +41,6 @@ jobs:
       - name: Run build
         working-directory: packages/nextjs
         run: npm run build
-
-      - name: Set environment variables for Scratch Auth
-        run: echo "SCRATCH_AUTH_SECRET_KEY=$SCRATCH_AUTH_SECRET_KEY" >> $GITHUB_ENV
 
       - name: Start the Next.js application
         working-directory: packages/nextjs
