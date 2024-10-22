@@ -45,7 +45,7 @@ jobs:
           npm install && npm link @scratch-auth/nextjs
 
       - name: Install wait-on
-        run: npm install wait-on
+        run: npm install -g wait-on
 
       - name: Start the Next.js application
         working-directory: test/nextjs
