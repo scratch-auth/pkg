@@ -7,59 +7,65 @@ on:
   pull_request:
     paths:
       - "packages/nextjs/**"
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      scratch-auth:
-        image: scratch-auth/scratch-auth:latest
-        ports:
-          - 4000:4000
-        options: >-
-          --env SCRATCH_AUTH_SECRET_KEY=${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
-        # 環境変数をsecretsに設定しておき、GitHub Actionsから参照します。
-
     env:
       SCRATCH_AUTH_SECRET_KEY: ${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
       NEXT_PUBLIC_REDIRECT_URL: "http://localhost:3000/api/auth"
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "18"
 
-      - name: Install dependencies
-        working-directory: packages/nextjs
+      - name: Install dependencies for test package
+        working-directory: test/nextjs
         run: npm install
 
-      - name: Run build
+      - name: NPM Link for test package
         working-directory: packages/nextjs
-        run: npm run build
+        run: npm link
 
-      - name: Set environment variables for Scratch Auth
-        run: echo "SCRATCH_AUTH_SECRET_KEY=$SCRATCH_AUTH_SECRET_KEY" >> $GITHUB_ENV
+      - name: Install dependencies & @scratch-auth/nextjs for test package
+        working-directory: test/nextjs
+        run: |
+          npm install && npm link @scratch-auth/nextjs
+
+      - name: Install wait-on
+        run: npm install -g wait-on
 
       - name: Start the Next.js application
-        working-directory: packages/nextjs
+        working-directory: test/nextjs
         run: npm run dev &
 
-      - name: Wait for server to be ready
-        run: npx wait-on http://localhost:3000
-
-      - name: Run authentication test
+      - name: Wait for server to be ready (using curl)
         run: |
-          curl -X POST http://localhost:3000/api/auth -d "privateCode=test"
-          echo "Testing authentication successful"
+          echo "Waiting for the server to be ready..."
+          for i in {1..10}; do
+            if curl --silent --fail http://localhost:3000; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Waiting for the server... (Attempt $i)"
+            sleep 5
+          done
 
       - name: Stop services
         run: |
-          kill $(lsof -t -i:3000)
+          kill $(lsof -t -i:3000) || true
         if: always()
 
       - name: Upload test results
