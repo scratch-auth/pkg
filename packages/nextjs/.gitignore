@@ -1,2 +1,4 @@
 /node_modules
 package-lock.json
+# Ignore test results
+test-results/
