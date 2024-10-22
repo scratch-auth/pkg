@@ -15,6 +15,7 @@ jobs:
 
     env:
       NEXT_PUBLIC_REDIRECT_URL: "http://localhost:3000/api/auth"
+      SCRATCH_AUTH_SECRET_KEY: ${{ secrets.SCRATCH_AUTH_SECRET_KEY }}  # Ensure secrets are set
 
     steps:
       - name: Checkout repository
@@ -47,15 +48,17 @@ jobs:
         run: npx wait-on http://localhost:3000
 
       - name: Run authentication test
-        env:
-          SCRATCH_AUTH_SECRET_KEY: ${{ secrets.SCRATCH_AUTH_SECRET_KEY }}  # Ensure secrets are here
         run: |
           curl -X POST http://localhost:3000/api/auth -d "privateCode=test"
           echo "Testing authentication successful"
 
       - name: Stop services
         run: |
-          kill $(lsof -t -i:3000)
+          if lsof -t -i:3000; then
+            kill $(lsof -t -i:3000)
+          else
+            echo "No process running on port 3000"
+          fi
         if: always()
 
       - name: Upload test results
