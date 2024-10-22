@@ -50,7 +50,7 @@ jobs:
 
       - name: Wait for server to be ready
         run: |
-          sleep 10  # 10秒待機してから接続を試みる
+          sleep 10
           npx wait-on http://localhost:3000
 
       - name: Run authentication test
