@@ -53,8 +53,12 @@ jobs:
 
       - name: Wait for server to be ready
         run: |
-          sleep 10
+          sleep 20  # 待機時間を延長
           wait-on http://localhost:3000
+
+      - name: Check logs
+        working-directory: test/nextjs
+        run: tail -n 50 .next/logs/*.log  # 直近のログを確認
 
       - name: Run authentication test
         run: |
