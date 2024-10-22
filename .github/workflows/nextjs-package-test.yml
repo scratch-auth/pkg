@@ -45,16 +45,16 @@ jobs:
           npm install && npm link @scratch-auth/nextjs
 
       - name: Install wait-on
-        run: npm install -g wait-on  # wait-onをグローバルにインストール
+        run: npm install wait-on
 
       - name: Start the Next.js application
         working-directory: test/nextjs
-        run: npm run dev &  # 開発サーバーをバックグラウンドで起動
+        run: npm run dev &
 
       - name: Wait for server to be ready
         run: |
           sleep 10
-          wait-on http://localhost:3000  # npxではなく直接呼び出す
+          wait-on http://localhost:3000
 
       - name: Run authentication test
         run: |
