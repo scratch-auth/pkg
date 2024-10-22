@@ -7,6 +7,7 @@ on:
   pull_request:
     paths:
       - "packages/nextjs/**"
+  workflow_dispatch:
 
 jobs:
   test:
