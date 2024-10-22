@@ -51,14 +51,17 @@ jobs:
         working-directory: test/nextjs
         run: npm run dev &
 
-      - name: Wait for server to be ready
+      - name: Wait for server to be ready (using curl)
         run: |
-          sleep 20  # 待機時間を延長
-          wait-on http://localhost:3000
-
-      - name: Check logs
-        working-directory: test/nextjs
-        run: tail -n 50 .next/logs/*.log  # 直近のログを確認
+          echo "Waiting for the server to be ready..."
+          for i in {1..10}; do
+            if curl --silent --fail http://localhost:3000; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Waiting for the server... (Attempt $i)"
+            sleep 5
+          done
 
       - name: Run authentication test
         run: |
