@@ -19,8 +19,7 @@ jobs:
         ports:
           - 4000:4000
         options: >-
-          --env SCRATCH_AUTH_SECRET_KEY=${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
-        # 環境変数をsecretsに設定しておき、GitHub Actionsから参照します。
+          --env SCRATCH_AUTH_SECRET_KEY=${{ env.SCRATCH_AUTH_SECRET_KEY }}
 
     env:
       SCRATCH_AUTH_SECRET_KEY: ${{ secrets.SCRATCH_AUTH_SECRET_KEY }}
