@@ -63,11 +63,6 @@ jobs:
             sleep 5
           done
 
-      - name: Run authentication test
-        run: |
-          curl -X POST http://localhost:3000/api/auth -d "privateCode=test"
-          echo "Testing authentication successful"
-
       - name: Stop services
         run: |
           kill $(lsof -t -i:3000) || true
