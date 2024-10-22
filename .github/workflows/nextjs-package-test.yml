@@ -42,15 +42,11 @@ jobs:
       - name: Install dependencies & @scratch-auth/nextjs for test package
         working-directory: test/nextjs
         run: |
-          npm install & npm link @scratch-auth/nextjs
+          npm install && npm link @scratch-auth/nextjs
 
       - name: Start the Next.js application
         working-directory: test/nextjs
-        run: npm run dev
-
-      - name: Run build for nextjs package
-        working-directory: test/nextjs
-        run: npm run build
+        run: npm run dev &  # 開発サーバーをバックグラウンドで起動
 
       - name: Wait for server to be ready
         run: npx wait-on http://localhost:3000
