@@ -15,8 +15,8 @@ export async function getAllCookie(): Promise<RequestCookie[]> {
 export async function getCookie(
   name: string
 ): Promise<RequestCookie | undefined> {
-  let res = cookies().get(name);
-  return res;
+  const cookieStore = await cookies();
+  return cookieStore.get(name);
 }
 
 export async function setCookie(
@@ -24,16 +24,16 @@ export async function setCookie(
     | [key: string, value: string, cookie?: Partial<ResponseCookie>]
     | [options: ResponseCookie]
 ): Promise<ResponseCookies> {
-  const res = cookies().set(...args);
-  return res;
+  const cookieStore = await cookies();
+  return cookieStore.set(...args);
 }
 
 export async function hasCookie(name: string): Promise<boolean> {
-  const res = cookies().has(name);
-  return res;
+  const cookieStore = await cookies();
+  return cookieStore.has(name);
 }
 
 export async function deleteCookie(name: string): Promise<ResponseCookies> {
-  const res = cookies().delete(name);
-  return res;
+  const cookieStore = await cookies();
+  return cookieStore.delete(name);
 }
