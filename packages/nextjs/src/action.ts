@@ -3,8 +3,7 @@
 import crypto from "crypto";
 import { v4 as uuidv4 } from "uuid";
 import pkgConfig from "./pkgConfig";
-import { cookies } from "next/headers";
-import { deleteCookie } from "./cookie/cookie.server";
+import { deleteCookie, getCookie, setCookie } from "./cookie/cookie.server";
 
 const secretKey = process.env.SCRATCH_AUTH_SECRET_KEY!;
 if (!secretKey) {
@@ -102,7 +101,7 @@ export async function setScratchAuthEncryptedData(
     expires.setDate(expires.getDate() + days);
   }
 
-  cookies().set({
+  await setCookie({
     name: content,
     value: encryptedValue,
     expires: expires,
@@ -114,7 +113,7 @@ export async function setScratchAuthEncryptedData(
 export async function getScratchAuthDecryptedSessionId(
   content: string
 ): Promise<string | null> {
-  const encryptedValue = cookies().get(content);
+  const encryptedValue = await getCookie(content);
   if (encryptedValue) {
     const decryptedValue = await ScratchAuthDecrypt(encryptedValue.value);
     if (decryptedValue) {
@@ -141,7 +140,7 @@ export async function getScratchAuthDecryptedSessionId(
 export async function getScratchAuthUserName(
   content: string
 ): Promise<string | null> {
-  const encryptedValue = cookies().get(content);
+  const encryptedValue = await getCookie(content);
   if (encryptedValue) {
     const decrypted = await ScratchAuthDecrypt(encryptedValue.value);
     if (decrypted) {

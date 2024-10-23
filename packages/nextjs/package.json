@@ -1,6 +1,6 @@
 {
   "name": "@scratch-auth/nextjs",
-  "version": "0.0.1-beta.9",
+  "version": "0.0.1-rc-3413t-20241023",
   "description": "Scratch Auth is a simple OAuth service for Scratch. It provides developers with an easy-to-understand API and users with a smooth login experience. By using @scratch-auth/nextjs, you can easily implement OAuth functionality into your site.",
   "main": "./src/index.d.ts",
   "scripts": {
