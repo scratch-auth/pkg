@@ -8,7 +8,8 @@ import {
 } from "next/dist/compiled/@edge-runtime/cookies";
 
 export async function getAllCookie(): Promise<RequestCookie[]> {
-  let res = cookies().getAll();
+  const cookieStore = await cookies();
+  let res = cookieStore.getAll();
   return res;
 }
 
