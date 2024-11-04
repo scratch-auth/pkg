@@ -7,3 +7,5 @@ export * from "./hooks/useUser.ts";
 export * from "./elements/Logined.tsx";
 export * from "./elements/UserButton.tsx";
 export * from "./elements/account.tsx";
+
+export * from "./components/provider.tsx";

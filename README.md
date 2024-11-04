@@ -36,3 +36,10 @@ Scratch Auth is licensed under the MIT License. For more details, please refer t
 If you have any questions or feedback, feel free to reach out via [GitHub Discussions](https://github.com/scratch-auth/pkg/discussions).
 
 Thank you for using Scratch Auth!
+
+---
+
+# Document
+
+- [Next.js](https://github.com/scratch-auth/pkg/blob/main/packages/nextjs/README.md)
+- [React](https://github.com/scratch-auth/pkg/blob/main/packages/react/README.md)
