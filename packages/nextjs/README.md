@@ -28,6 +28,7 @@ SCRATCH_AUTH_SECRET_KEY=***************************************
 This page will decode the session and verify account information. You need to add this file to the path of the `redirect_url` that you set in `scratch-auth.config.ts`. During the redirect, the session will be set in the `privateCode` parameter.
 
 ```tsx filename="app/api/auth/page.tsx"
+// /src/app/api/auth/page.tsx
 "use client";
 
 import React, { useEffect } from "react";
@@ -72,6 +73,7 @@ By using Scratch Auth’s pre-built components, you can control the content disp
 - `<LogInButton />`: An unstyled component that links to the login page. In this example, since no properties or environment variables are specified for the login URL, the component will link to the login page of the account portal.
 
 ```tsx filename="app/page.tsx"
+// /src/app/page.tsx
 import React from "react";
 import {
   LogInButton,
@@ -106,6 +108,7 @@ export default function Page() {
 | debug        | Debug mode                                  |
 
 ```tsx filename="scratch-auth.config.ts"
+// /scratch-auth.config.ts
 import { ScratchAuthConfig } from "@scratch-auth/nextjs/src/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -138,3 +141,51 @@ up and create the first user.
 </Steps>
 
 [@Looky1173](https://github.com/Looky1173) / [@Fun117](https://github.com/Fun117)
+
+---
+
+# プロバイダー
+
+バージョン `0.0.2` で実装される認証プロバイダー機能です。
+
+プロバイダーの設定をすることで、ログインしていないユーザーに特定の制限を設定できます。
+
+```ts
+type ConfigProps = {
+  noLogin: {
+    redirect?: string;
+    function?: () => void;
+    children?: React.ReactNode;
+  };
+};
+```
+
+制限したい要素の親要素に、`ScratchAuthProvider` を設置してください。
+
+```tsx
+// /src/app/dashboard/layout.tsx
+import ScratchAuthProvider from "@scratch-auth/nextjs/src/components/provider";
+
+export default function DashboardLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return <ScratchAuthProvider>{children}</ScratchAuthProvider>;
+}
+```
+
+ログインしているユーザーは認証プロバイダーで制限されている要素を表示することができます。
+
+```tsx
+// /src/app/dashboard/page.tsx
+import React from 'react'
+
+function page() {
+  return (
+    <div>page</div>
+  )
+}
+
+export default page
+```
