@@ -18,7 +18,7 @@
     "url": "https://github.com/scratch-auth/docs/issues",
     "email": "fun117.kun@gmail.com"
   },
-  "homepage": "https://scratch-auth.netlify.app",
+  "homepage": "https://scratch-auth.onrender.com",
   "license": "MIT",
   "dependencies": {
     "@vercel/analytics": "^1.3.2",
