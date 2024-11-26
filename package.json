@@ -22,7 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "@vercel/analytics": "^1.4.1",
-    "lucide-react": "^0.460.0",
+    "lucide-react": "^0.461.0",
     "next": "^15.0.3",
     "next-sitemap": "^4.2.3",
     "nextra": "^3.2.4",
